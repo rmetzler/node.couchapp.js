@@ -1,4 +1,4 @@
- var couchapp = require('couchapp')
+var couchapp = require('couchapp')
   , path = require('path')
   ;
 
@@ -7,21 +7,22 @@ ddoc =
   , rewrites: 
     [ {from:"/", to:'index.html'}
     , {from:"cache.manifest", to:'_show/cache'}
-    , {from:"favicon.ico", to:'vendor/couchdb.ico'}
-    , {from:"favicon.png", to:'vendor/couchdb.ico'}
-    , {from:"vendor/*", to:'vendor/*'}
+    , {from:"favicon.png", to:'favicon.ico'}
     , {from:"/api", to:'../../'}    
     , {from:"/api/*", to:'../../*'}
     , {from:"/*", to:'*'}
     ]
   , shows: {
       cache: function(head, req) {
-        return {
-          "headers": { 
-            "Content-Type": "text/cache-manifest"
-          },
-          "body": "CACHE MANIFEST\n/index.html"
+        var manifest = "";
+        for (var a in this._attachments) {
+          manifest += ("/" + a + "\n");
         }
+        var r =
+          { "headers": { "Content-Type": "text/cache-manifest"}
+          , "body": "CACHE MANIFEST\n" + manifest
+          }
+        return r;
       }
     }
   }
