@@ -4,12 +4,23 @@
 
 ddoc = 
   { _id:'_design/app'
-  , rewrites : 
+  , rewrites: 
     [ {from:"/", to:'index.html'}
+    , {from:"/cache.manifest", to:'_show/cache'}
     , {from:"/api", to:'../../'}
     , {from:"/api/*", to:'../../*'}
     , {from:"/*", to:'*'}
     ]
+  , shows: {
+      cache: function(head, req) {
+        return {
+          "headers": { 
+            "Content-Type": "text/cache-manifest"
+          },
+          "body": "CACHE MANIFEST\n/index.html"
+        }
+      }
+    }
   }
   ;
 
