@@ -6,8 +6,11 @@ ddoc =
   { _id:'_design/app'
   , rewrites: 
     [ {from:"/", to:'index.html'}
-    , {from:"/cache.manifest", to:'_show/cache'}
-    , {from:"/api", to:'../../'}
+    , {from:"cache.manifest", to:'_show/cache'}
+    , {from:"favicon.ico", to:'vendor/couchdb.ico'}
+    , {from:"favicon.png", to:'vendor/couchdb.ico'}
+    , {from:"vendor/*", to:'vendor/*'}
+    , {from:"/api", to:'../../'}    
     , {from:"/api/*", to:'../../*'}
     , {from:"/*", to:'*'}
     ]
