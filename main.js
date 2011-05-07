@@ -42,6 +42,7 @@ function createApp (doc, url, cb) {
         if (i[0] != '_') {
           if (typeof x[i] == 'function') {
             x[i] = x[i].toString()
+            x[i] = 'function '+x[i].slice(x[i].indexOf('('))
           }
           if (typeof x[i] == 'object') {
             p(x[i])
@@ -61,7 +62,7 @@ function createApp (doc, url, cb) {
     doc._attachments = copy(app.doc._attachments)
     delete doc.__attachments;
     var body = JSON.stringify(doc)
-    console.log('PUT '+url)
+    console.log('PUT '+url.replace(/^(https?:\/\/[^@:]+):[^@]+@/, '$1:******@'))
     request({uri:url, method:'PUT', body:body, headers:h}, function (err, resp, body) {
       if (err) throw err;
       if (resp.statusCode !== 201) throw new Error("Could not push document\n"+body)
@@ -91,11 +92,11 @@ function createApp (doc, url, cb) {
     revpos = app.doc._rev ? parseInt(app.doc._rev.slice(0,app.doc._rev.indexOf('-'))) : 0;
     
     app.doc.__attachments.forEach(function (att) {
-      watch.walk(att.root, function (err, files) {
+      watch.walk(att.root, {ignoreDotFiles:true}, function (err, files) {
         for (i in files) { (function (f) {
           pending += 1
           fs.readFile(f, function (err, data) {
-            f = f.replace(att.root, app.prefix || '');
+            f = f.replace(att.root, att.prefix || '');
             if (f[0] == '/') f = f.slice(1)
             if (!err) {
               var d = data.toString('base64')
@@ -205,7 +206,10 @@ function createApp (doc, url, cb) {
     })
   }
   
-  if (url.slice(url.length - doc._id.length) !== doc._id) url += '/' + doc._id;
+  var _id = doc.app ? doc.app._id : doc._id
+  
+  if (url.slice(url.length - _id.length) !== _id) url += '/' + _id;
+
   request({uri:url, headers:h}, function (err, resp, body) {
     if (err) throw err;
     if (resp.statusCode == 404) app.current = {};
